@@ -1,6 +1,7 @@
 const ExpressError = require('../ExpressError.js');
 const express = require('express');
 const Cars = require('./cars-model.js');
+const vinValidator = require('vin-validator');
 
 
 exports.checkCarId = async (req, res, next) => {
@@ -12,7 +13,7 @@ exports.checkCarId = async (req, res, next) => {
       req.car = car;
       next();
     } else {
-      next(new ExpressError( ' Car with id is <car id> not found ', 404 ));
+      next(new ExpressError('Car with id ' +req.params.id+ ' is not found', 404 ));
     }
   }
   catch (err){
@@ -23,8 +24,26 @@ exports.checkCarId = async (req, res, next) => {
 exports.checkCarPayload = (req, res, next) => {
   // DO YOUR MAGIC
  const newCar = req.body;
- if (!newCar.id && !newCar.vin && !newCar.make && !newCar.model && !newCar.mileage && !newCar.title && !newCar.transmission){
-   const err = new ExpressError('<field name> is missing', 400)
+ if (newCar.vin == '' || newCar.make == '' || newCar.model == '' || newCar.mileage == '' || newCar.title == '' || newCar.transmission == ''){
+   const err = new ExpressError();
+   if(newCar.vin == ''){
+    err = new ExpressError(`Vin is missing`, 400)
+   }
+   if(newCar.make == ''){
+    err = new ExpressError(`Make is missing`, 400)
+   } 
+   if(newCar.model == ''){
+    err = new ExpressError(`Mode is missing`, 400)
+   }    
+   if(newCar.mileage == ''){
+    err = new ExpressError(`Mileage is missing`, 400)
+   }   
+   if(newCar.title == ''){
+    err = new ExpressError(`Title is missing`, 400)
+   }    
+   if(newCar.transmission == ''){
+    err = new ExpressError(`Transmission is missing`, 400)
+   }    
    next(err);
  } else {
    next();
@@ -33,10 +52,11 @@ exports.checkCarPayload = (req, res, next) => {
 
 exports.checkVinNumberValid = (req, res, next) => {
   // DO YOUR MAGIC
-  if(req.body.vin){
+  const isValidVin = vinValidator.validate(req.body.vin);
+  if(isValidVin){
     next();
   }else {
-    next(new ExpressError('Vin <vin number> is invalid', 400))
+    next(new ExpressError(`Vin ${req.body.vin} is invalid`, 400))
   }
 }
 

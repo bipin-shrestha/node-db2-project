@@ -10,17 +10,17 @@ const getById = (id) => {
   return db('cars').where({ id });
 }
 
-const create = (newCar) => {
+const create = async (newCar) => {
   // DO YOUR MAGIC
-  const ids = db('cars').insert(newCar);
+  const ids = await db('cars').insert(newCar);
   return getById(ids[0]);
 }
 
-const updateById = async (id, car) => {
+const updateById = (id, car) => {
   return db('cars').update(car).where({ id });
 }
 
-const deleteById = async (id) => {
+const deleteById = (id) => {
   return db('cars').del().where({ id })
 }
 
